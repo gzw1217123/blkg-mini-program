@@ -1,0 +1,21 @@
+<view class="container">
+    <view class="top">
+        <image class="avatar" src="{{avatar}}" mode="scaleToFill"></image>
+        <image class="order_status" src="{{ordered ? vipImagePath : noVipImagePath}}"></image>
+        <view class="info">
+            <view class="nickName">{{nickName}}</view>
+            <image class="sex" src="{{isMale ? maleImage : femaleImage}}"></image>
+        </view>
+    </view>
+    <view class="content">
+        <view catchtap="toPage" data-page="fav/song">
+            <view class="icon song_fav" >1</view><view class="title song_fav">歌曲收藏</view>
+        </view>
+        <view catchtap="toPage" data-page="fav/songlist">
+            <view class="icon songlist_fav">1</view><view class="title songlist_fav">歌单收藏</view>
+        </view>
+        <view catchtap="toPage" data-page="order">
+            <view class="icon order">1</view><view class="title order">开通会员</view>
+        </view>
+    </view>
+</view>

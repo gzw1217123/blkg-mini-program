@@ -1,0 +1,35 @@
+<include src="../../component/toast/index.wxml" />
+<scroll-view class="container" bindtap="globalTap" >
+  <view class="info">
+    <image src="{{thumb === undefined ? '' : thumb}}" class="bg"></image>
+    <view class="info_content">
+      <view class="info_thumb" style="{{thumb === undefined ? '' : 'background-image:url('+thumb+')'}}"></view>
+      <view class="info_detail">
+        <view class="title">{{songlist_name}}</view>
+        <view class="play_all" catchtap="playAll">
+          <image src="/image/songlist/play.png"></image>
+          <view class="btn">播放全部</view>
+        </view>
+        <view class="fav_songlist" catchtap="favSonglist">
+          <image src="{{isFav ? faved : fav}}"></image>
+          <view class="btn">收藏歌单</view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="song" bindtouchstart="touchS" bindtouchmove="touchM" bindtouchend="touchE">
+    <block wx:for="{{recommendSong}}" wx:key="index">
+      <template is="song_item" data="{{song:item, index:index}}"></template>
+    </block>
+  </view>
+</scroll-view>
+<template name="song_item">
+  <view class="song_item_container" catchtap="chooseSong" data-code="{{song.code}}" data-index="{{index}}">
+    <view class="song_item" class="song_item {{song.move}}" data-index="{{index}}">
+      <text class="song_index" data-index="{{index}}">{{index + 1}}.</text>
+      <text class="song_name" data-index="{{index}}">{{song.name}}</text>
+      <text class="song_player" data-index="{{index}}">{{song.player}}</text>
+      <text data-index="{{index}}" data-fav="{{song.fav == true ? 'true' : 'false'}}" class="fav" catchtap="favSong">{{song.fav == true ? '已收藏' : '收藏'}}</text>
+    </view>
+  </view>
+</template>

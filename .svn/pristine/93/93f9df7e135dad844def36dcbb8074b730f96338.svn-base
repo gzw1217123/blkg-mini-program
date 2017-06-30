@@ -1,0 +1,71 @@
+var api = require('../../utils/api.js')
+var util = require('../../utils/util.js')
+var app = getApp()
+
+Page({
+  data: {
+    "connected": app.globalData.connected,
+    "userinfo": app.globalData.userInfo
+  },
+  onLoad: function (options) {
+    /*var that = this
+    that.updata("best", 0)
+    that.updata("newest", 0)
+    app.getUserInfo(function (userInfo) {
+      that.setData({
+        userInfo: userInfo
+      })
+      that.updata("best", 0)
+      that.updata("newest", 0)
+    })
+    that.onLoadOther();
+    wx.showShareMenu({
+      withShareTicket: true
+    })*/
+  },
+  
+  onReady: function() {
+    // Do something when page ready.
+  },
+  onShow: function() {
+    // Do something when page show.
+  },
+  onHide: function() {
+    // Do something when page hide.
+  },
+  onUnload: function() {
+    // Do something when page close.
+  },
+  onPullDownRefresh: function() {
+    // Do something when pull down.
+  },
+  onReachBottom: function() {
+    // Do something when page reach bottom.
+	//this.bindscrolltolower();
+  },
+  onShareAppMessage: function () {
+    return {
+      title: '幸福健身团',
+      desc: '专属您的健身专家',
+      path: '/pages/community',
+      success: function (res) {
+        // 转发成功
+        console.log(res.shareTickets[0]);
+        wx.getShareInfo({
+          shareTicket: res.shareTickets[0],
+          success(res){
+            console.log(res);
+          } 
+        })
+      },
+    }
+  },
+  previewImg: function (e) {
+    api.previewImg(e);
+  },
+
+  /************************************************************ */
+  onLoadOther: function () {
+    
+  }
+})

@@ -1,0 +1,357 @@
+var api = require('../../utils/api.js')
+var util = require('../../utils/util.js')
+var Connector = require('../../utils/connector-pomelo.js')
+
+var app = getApp();
+
+Page({
+  data: {
+    tabs: ['发表情', '发弹幕',],
+    stv: {
+      windowWidth: 0,
+      lineWidth: 0,
+      offset: 0,
+      tStart: false
+    },
+    activeTab: 0,
+    index1: 0,
+    imgBase: api.imgBase,
+    loading: false,
+    loadtxt: '正在加载',
+    userInfo: app.globalData.userInfo, // 存放用户信息
+    currentTab: 0,
+    menuitem: [{
+      currentpage: '0',
+      text: "发表情"
+    }, {
+      currentpage: '1',
+      text: "发弹幕"
+    }],
+    connector:{},
+    //tv_id: '329670409FB67FBD',
+    tv_id: app.globalData.connectedInfo.unionId,
+    room_id: app.globalData.connectedInfo.room_id,
+    isPlayPage: false,
+    connectClass: 'disconnected',
+    hoverConnectClass: "disconnected_on",
+    playClass: 'play',
+    hoverPlayClass: 'play_on',
+    accompanyClass: 'original',
+    hoverAccompanyClass: 'original_on',
+    nextClass: 'next',
+    hoverNextClass: 'next_on',
+    replayClass: 'replay',
+    hoverReplayClass: 'replay_on',
+  },
+  /**
+  * 滑动切换tab
+  */
+  bindChange: function (e) {
+    this.setData({ currentTab: e.detail.current });
+  },
+  /**
+   * 点击tab切换
+   */
+  swichNav: function (e) {
+    var that = this;
+    if (this.data.currentTab === e.currentTarget.dataset.current) {
+      return false;
+    } else {
+      that.setData({
+        currentTab: e.currentTarget.dataset.current
+      })
+    }
+  },
+  onLoad: function (options) {
+
+    app.onLogined(this, "onConnect");
+  },
+  onShow: function () {
+    var that = this;
+    var connector = this.data.connector;
+    console.log(app.globalData.connected);
+      //更新链接按钮状态
+      if(app.globalData.connected){
+        that.setData({
+          connectClass: 'connected',
+          hoverConnectClass: "connected_on"
+        })
+      }else{
+        that.setData({
+          connectClass: 'disconnected',
+          hoverConnectClass: "disconnected_on"
+        })
+      }
+
+      // connector.getUserInfo(that.data.tv_id, function (data) {
+      //   if (data.isOnline == false) {
+      //     that.data.isPlayPage = false;
+      //     console.log('您的电视不在播放哦，即将自动退出播控页面');
+      //   }
+      //   else {
+      //     console.log('查询电视状态');
+      //     connector.sendMessage("@" + that.data.tv_id, "getTVPage", "");
+      //   }
+      // });
+  },
+  onHide: function () {
+  },
+  //连接按钮点击事件
+  toConnect: function() {
+    var that = this;
+    var connector = this.data.connector;
+    //更新链接按钮状态
+    if (app.globalData.connected) {
+      wx.showModal({
+        title: '提示',
+        content: '是否断开与电视的连接',
+        success: function (res) {
+          if (res.confirm) { //断开与电视的链接
+            connector.disconnect();
+            app.globalData.connectedInfo.unionId = null;
+            app.globalData.connectedInfo.role = null;
+            app.globalData.connectedInfo.room_id = null;
+            app.globalData.connected = false;
+            that.setData({
+              connectClass: 'disconnected',
+              hoverConnectClass: "disconnected_on"
+            })
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+          }
+        }
+      })
+    } else {
+
+      wx.redirectTo({
+        url: '/pages/connect_help/index' 
+      })
+    }
+  },
+  onConnect: function (loginData){
+    var that = this;
+    if (loginData && loginData.userInfo) {
+      that.setData({
+        userInfo: loginData.userInfo,
+        tv_id: app.globalData.connectedInfo.unionId,
+        room_id: app.globalData.connectedInfo.room_id
+
+      });
+      //var phone_id = that.data.userInfo.unionId;
+      var phone_id = app.getConnectId();
+      var connector = new Connector(api.CONNECTOR_SERVER, api.CONNECTOR_PORT);
+      that.data.connector = connector;
+      connector.on('connect', function () {
+        connector.login(phone_id, function (data) {
+          if (data.code === 200) {
+            console.log('登录成功！');
+
+            connector.joinRoom(that.data.room_id, function (data) {
+              if (data.code != 200) {
+                //清空房间号
+              }
+              else {
+                console.log('加入房间成功' + that.data.room_id);
+              }
+            });
+            that.afterConnect();
+          }
+
+        });
+      });
+    }
+  },
+  //连接后的操作
+  afterConnect: function() {
+
+    var that = this;
+    var connector = this.data.connector;
+    
+    connector.on('disconnect', function (data) {
+      console.log('与服务器连接中断！');
+    });
+    connector.on('onUserSendMessage', function (data) {
+
+      if (data.from === connector.uid) return; // 屏蔽自己发来的消息
+      console.log('收到消息：', data.message);
+
+
+      //电视发来的互动消息
+      if (data.message.type === "control") {
+        console.log('收到电视的控制消息:' + data.message.content);
+        var content = data.message.content;
+        if (content === 'play') {
+          that.setData({ playClass: 'play', hoverPlayClass: 'play_on' })
+        } else if (content === 'pause') {
+          that.setData({ playClass: 'pause', hoverPlayClass: 'pause_on' })
+        } else if (content === 'Left') {
+          that.setData({ accompanyClass: 'accompany', hoverAccompanyClass: 'accompany_on', })
+        } else if (content === 'Stereo') {
+          that.setData({ accompanyClass: 'original', hoverAccompanyClass: 'original_on', })
+        }
+
+      }
+    });
+
+
+    connector.on('onUserLogin', function (data) { }); // 用户登录时触发
+    connector.on('onUserLogout', function (data) { }); // 用户退出时触发
+    connector.on('onUserJoinRoom', function (data) { }); // 用户进入房间时触发
+    connector.on('onUserLeaveRoom', function (data) { }); // 用户离开房间时触发
+
+  },
+  onReachBottom: function () {
+    this.bindscrolltolower();
+  },
+  /**
+  * 下滑
+  */
+  bindscrolltolower() {
+
+  },
+  /**
+* 下拉刷新
+*/
+  onPullDownRefresh() {
+
+  },
+
+  /**
+    * 数据更新（追加或重置）
+    */
+  updata(type, mold) {
+
+  },
+ toPage: function (e) {
+    var page = e.currentTarget.dataset.page;
+    util.toPage(e, 1);
+
+  },
+  previewImg: function (e) {
+    api.previewImg(e);
+  },
+
+  onShareAppMessage: function () {
+    return {
+      title: '幸福健身团',
+      desc: '专属您的健身专家',
+      path: '/pages/community',
+      success: function (res) {
+        // 转发成功
+        console.log(res.shareTickets[0]);
+        wx.getShareInfo({
+          shareTicket: res.shareTickets[0],
+          success(res) {
+            console.log(res);
+          }
+        })
+      },
+    }
+  },
+  toDetailPage: function (e) {
+    var data = e.currentTarget.dataset
+    var toDetail = data.todetail;
+    if (toDetail == "todetail") {
+      this.toPage(e);
+    }
+  },
+  /************************************************************ */
+  onLoadOther: function () {
+
+  },
+  _updateSelectedPage(page) {
+
+  },
+  //跳转页面
+  handlerTabTap(e) { 
+
+    if (!app.globalData.connected) {
+      util.alert('你没连接电视，还不能互动~');
+      setTimeout(function () {
+        wx.navigateTo({
+          url: '/pages/connect_help/index'
+        });
+      }, 1000)
+      return;
+    }
+
+    console.log("当前index:" + e.currentTarget.dataset.index);
+    var index = e.currentTarget.dataset.index;
+    var data = e.currentTarget.dataset;
+    if(index === 0 ){
+      data.page = "expression";
+      util.toPage(e, 1);
+    }else if(index === 1){
+      data.page = "danmu/customed";
+      util.toPage(e, 1);
+    }
+  },
+  //小程序对电视播放控制
+  playControl: function (e) {
+    var that = this;
+
+    if (!app.globalData.connected) {
+      util.alert('你没连接电视，还不能互动~');
+      setTimeout(function () {
+        wx.navigateTo({
+          url: '/pages/connect_help/index'
+        });
+      }, 1000)
+      return;
+    }
+
+    var connector = this.data.connector;
+    var conntrolType = e.currentTarget.dataset.type;
+    this.data.connector.sendMessage("@" + that.data.tv_id, "getTVPage", "",function(data1){
+      if(data1.code == 200){
+        connector.on('onUserSendMessage', function (data) {
+
+          if (data.from === connector.uid) return; // 屏蔽自己发来的消息
+
+          if (data.message.type === "playPage") {
+
+            if (data.message.content === false) {
+              console.log('当前是不播放页');
+              that.setData({
+                isPlayPage: false,
+              });
+              util.alert('电视端不在播放页面，不能互动~');
+              return false;
+            } else {
+              console.log('当前是播放页');
+              that.setData({
+                isPlayPage: true,
+              });
+              console.log(that.data.isPlayPage);
+
+            }
+          }
+        })
+      }
+    });
+
+    switch (conntrolType) {
+      case 'nextSong'://下一首
+        this.data.connector.sendMessage('@' + this.data.tv_id, 'control', 'next');
+        break;
+      case 'replay'://重播
+        this.data.connector.sendMessage("@" + this.data.tv_id, "control", "replay");
+        break;
+      case 'playOrPause'://暂停或播放
+        this.data.connector.sendMessage("@" + this.data.tv_id, "control", "play_pause");
+        break;
+      case 'accompanyOrOrginal'://原伴唱切换
+        this.data.connector.sendMessage("@" + this.data.tv_id, "control", "yuan_ban");
+        break;
+      case 'volUp'://声音调大
+        this.data.connector.sendMessage("@" + this.data.tv_id, "control", "vol_up");
+        break;
+      case 'volDown'://声音调小
+        this.data.connector.sendMessage("@" + this.data.tv_id, "control", "vol_down");
+        break;
+
+      default:
+        util.alert('出错了')
+    }
+  }
+})

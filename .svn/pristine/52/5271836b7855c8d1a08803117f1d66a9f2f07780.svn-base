@@ -1,0 +1,33 @@
+<!--input.wxml-->
+<include src="../../component/toast/index.wxml"/>
+<view class="container">
+  <view class="circle">
+  <icon class="search" type="search" size="20"/>
+    <input class="search_text" maxlength="15" placeholder="歌曲名，歌手名" auto-focus bindconfirm="textSearch"/>
+    <image class="speech_btn" src="/image/choose_song/speech_btn.png" bindtap="speechSearch">
+    </image>
+  </view>
+
+  <view class='{{flag===1?"hide":""}}'>
+    <image class='speech' src="/image/choose_song/speech.png">
+    </image>
+    <view class="cancel"  bindtap="cancel"></view>
+    <view class="ok"  bindtap="ok"></view>
+  </view>
+  <view class="recommend_title">{{title}}</view>
+  <view class="recommend_song_container" bindtouchstart="touchS" bindtouchmove="touchM" bindtouchend="touchE">
+  <block wx:for="{{recommendSong}}" wx:key="index">
+    <template is="song_item" data="{{song:item, index:index}}"></template>
+  </block>
+  </view>
+  <template name="song_item">
+    <view class="song_item_container" catchtap="chooseSong"  data-code="{{song.code}}" data-index="{{index}}" >
+      <view class="song_item {{song.move}}" data-index="{{index}}">
+        <text class="song_index" data-index="{{index}}">{{index + 1}}.</text>
+        <text class="song_name" data-index="{{index}}">{{song.name}}</text>
+        <text class="song_player" data-index="{{index}}">{{song.player}}</text>
+        <text data-index="{{index}}" data-fav="{{song.fav == true ? 'true' : 'false'}}" class="fav" catchtap="favSong">{{song.fav == true ? '已收藏' : '收藏'}}</text>
+      </view>
+    </view>
+  </template>
+</view>

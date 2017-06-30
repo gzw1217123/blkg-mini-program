@@ -1,0 +1,187 @@
+/**
+ * 封装好的pomelo连接对象，使用时只需要new Connector()即可
+ * Created by LXA on 2016/1/25.
+ */
+//var pomelo = require('./pomelo-client.js')
+
+(function () {
+  var pomeloClient = require('../wxsocket.io/pomelo-client.js')
+  var pomelo = pomeloClient.pomelo;
+  var Connector = function (host, port) {
+    this.socket = null;
+    this.init(host, port);
+  };
+  var connector = Connector.prototype;
+  connector.init = function (host, port) {
+    host = host || '11.liuxianan.cn';
+    port = port || 3014;
+    this.connect({ host: host, port: port });
+  };
+
+  /**
+   * 连接后台服务器
+   * @param data
+   */
+  connector.connect = function (data) {
+    var that = this;
+    var uuid = getRandomUuid();
+    //queryEntry(uuid, function (host, port) {
+    pomelo.init({ host: data.host, port: data.port }, function () {
+        console.log('第二次初始化pomelo成功！');
+        pomelo.request('connector.connectorHandler.enter', { uuid: uuid }, function () {
+          console.log('enter success', arguments);
+          that.onPomeloConnect();
+        });
+      });
+    //});
+    function getRandomUuid() {
+      var str = '';
+      for (var i = 0; i < 16; i++)
+        str += String.fromCharCode(Math.floor(Math.random() * 26) + 65);
+      return str;
+    }
+    function queryEntry(uuid, callback) {
+      pomelo.init({ host: data.host, port: data.port }, function () {
+        console.log('第一次初始化pomelo成功！');
+        // 查询连接实例
+        pomelo.request('gate.gateHandler.queryEntry', { uuid: uuid }, function (resp) {
+          console.log('获取连接实例：' + resp.host + ':' + resp.port);
+          pomelo.disconnect(); // 主动断开连接
+          if (resp.error) {
+            console.log(resp.text);
+            return;
+          }
+          callback(resp.host, resp.port);
+        });
+      });
+    }
+  };
+
+
+  /**
+   * 发送数据，所有客户端发送数据都是使用本方法
+   * @param event 事件名称
+   * @param data 数据内容
+   * @param callback 回调函数
+   */
+  connector.emit = function (event, data, callback) {
+    pomelo.request('chat.chatHandler.request', { cmd: event, data: data }, function (data) {
+      console.log(event + 'Response', data);
+      if (callback) callback(data);
+    });
+  };
+
+  /**
+   * 绑定事件
+   * @param event 事件名称
+   * @param fn 事件方法
+   */
+  connector.on = function (event, fn) {
+    // pomelo的connector事件比较特殊，需要特殊处理
+    if (event === 'connect') {
+      connector.onPomeloConnect = fn;
+      return;
+    }
+    pomelo.on(event, function (data) {
+      console.log(event, data);
+      if (fn) fn(data);
+    });
+  };
+
+  /**
+   * 登录，按照目前的案例来看一般都不需要密码，所谓的登录只是传一个uid给后台而已
+   * @param uid 用户ID，全局唯一
+   * @param callback 回调函数
+   */
+  connector.login = function (uid, callback) {
+    this.uid = uid;
+    this.emit('login', { uid: uid, pwd: '123' }, callback);
+  };
+
+  /**
+   * 发送消息
+   * @param target 发送目标，* 表示所有人，@uid 表示发送具体某个人，否则就视为rid（即发送给某个群）
+   * @param type 消息类型，这个完全右使用者自定义，如 text表示文本，image表示图片，face 表示表情
+   * @param content 消息内容
+   * @param callback 回调函数
+   */
+  connector.sendMessage = function (target, type, content, callback) {
+    this.emit('sendMessage', { target: target, message: { type: type, content: content } }, callback);
+  };
+
+  /**
+   * 创建房间
+   * @param rname 房间名称
+   * @param callback
+   */
+  connector.createRoom = function (rname, callback) {
+    this.emit('createRoom', { rname: rname }, callback);
+  };
+
+  /**
+   * 加入房间
+   * @param rid 房间号
+   * @param callback
+   */
+  connector.joinRoom = function (rid, uid, callback) {
+    this.emit('joinRoom', { rid: rid, uid: uid, source: '直接查找' }, callback);
+  };
+
+  /**
+   * 离开房间
+   * @param rid 房间号
+   * @param callback
+   */
+  connector.leaveRoom = function (rid, callback) {
+    this.emit('createRoom', { rid: rid }, callback);
+  };
+  /**
+   * 获取某个用户的信息，并且返回是否在线，如果在线，同时返回user对象
+   * 如果不传uid，表示获取用户自己的信息
+   * @param uid
+   * @param callback
+   */
+  connector.getUserInfo = function (uid, callback) {
+    if (typeof uid === 'function') {
+      callback = uid;
+      uid = undefined;
+    }
+    this.emit('getUserInfo', { uid: uid }, callback);
+  };
+
+  /**
+   * 获取服务器已经创建的所有房间，主要用于开发者调试用
+   * @param callback
+   */
+  connector.getAllRoom = function (callback) {
+    this.emit('getAllRoom', {}, callback);
+  };
+
+  /**
+   * 主动断开连接
+   */
+  connector.disconnect = function () {
+    pomelo.disconnect();
+  };
+  /**
+   * 判断某个用户是否加入了某个房间
+   * @param uid 用户iD
+   * @param rid 房间ID
+   * @param callback 回调true或者false
+   */
+  connector.checkUserIsJoinRoom = function (uid, rid, callback) {
+    this.getUserInfo(uid, function (data) {
+      if (!data || data.code != 200 || !data.isOnline) callback(false);
+      else callback(data.user.rooms[rid] ? true : false);
+    });
+  };
+
+
+  //window.Connector = Connector;
+
+
+  //module.Connector = connector.init;
+  module.exports = Connector;
+
+})();
+

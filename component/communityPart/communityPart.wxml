@@ -1,0 +1,38 @@
+<import src="../avatar/avatar.wxml" />
+<template name="communityPart">
+
+  <!--社区基本小模块 开始-->
+  <view class="containsView">
+
+    <!--头部 基本信息-->
+    <view class="topContainsView">
+
+      <!-- <image class="profileImage" bindtap="toPage" data-page="personal" data-parameter="?userid={{commPart.userid}}&role={{commPart.role}}&personalType=other" src="{{imgBase+commPart.avatar}}" />-->
+      <template is="avatar" data="{{ userid:commPart.userid,role:commPart.role,avatar:commPart.avatar,imgBase:imgBase }}" />
+      <view class="topRightView">
+        <text class="topRightName">{{commPart.userid}}</text>
+        <text class="topRightTime">{{commPart.addTime}}</text>
+      </view>
+    </view>
+
+    <!-- 中部 评论及照片 -->
+    <view class="middleContainsView">
+
+      <!-- 图片列表 -->
+      <view class="middleImageView" bindtap="previewImg" data-img="{{commPart.picUrls}}">
+        <image class="middleImage" wx:for="{{commPart.picUrls}}" wx:if="{{item}}" src="{{item}}"></image>
+      </view>
+
+      <!-- 评论 后台返回不统一（commPart. content||commPart. comment（dyranicDetail里是这个））-->
+      <view class="middleContent" catchtap="toPage" data-page="dyranicDetail" data-parameter="?dyramicId={{commPart.dyramicId}}">{{commPart. content||commPart. comment}}</view>
+    </view>
+
+    <!-- 评论数以及点赞数 -->
+    <view class="bottomContainsView " wx:if="{{commPart.commentNum>=0}}">
+      <view class="commentNum" >评论{{commPart.commentNum}}</view>
+      <view class="voteNum"  bindtap="vote"  data-vote="{{commPart.hasVote}}"  data-index="{{index}}" >点赞{{commPart.voteNum}}</view>
+    </view>
+  </view>
+
+  <!--社区基本小模块 结束-->
+</template>

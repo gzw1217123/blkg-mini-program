@@ -1,0 +1,22 @@
+<form bindsubmit="submit">
+  <view class="add-list">
+    <view class="add-item">
+      <textarea name="content" placeholder="最多输入50个字" placeholder-style="color:#8891a7;" maxlength="50" bindconfirm="可输入50字" ></textarea>
+    </view>
+    <view class="add-item ">
+      <view class="titleView">
+        <text>开启弹幕</text>
+        <switch class="title-right" checked bindchange="switch1Change"/>
+      </view>
+    </view>
+      <view class="add-item ">
+      <view class="titleView" bindtap="toPage" data-page="danmu/default">
+        <text>选择弹幕</text>
+        <image class="image-right" src="/image/danmu/arrow_right.png" ></image>
+      </view>
+    </view>
+  </view>
+  <view class="btn-submit">
+    <button loading="{{loading}}" disabled="{{disabled}}" formType="submit" class="btn-block">发 布</button>
+  </view>
+</form>

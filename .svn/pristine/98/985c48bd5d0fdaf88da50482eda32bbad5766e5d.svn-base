@@ -1,0 +1,39 @@
+<include src="../../component/toast/index.wxml"/>
+<view class="container" catchtap="globalTap" bindtouchstart="touchGlobalS" bindtouchmove="touchGlobalM">
+  <view wx:if="{{!connected}}" class="connect_tip" catchtap="goConnect">
+    <view class="tip">还木有连接电视哦！快戳我去连接吧！</view>
+    <image class="tip_icon" src="/image/recommend/left.png" mode="aspectFit"></image>
+  </view>
+  <view class="recommend_title">推荐歌单</view>
+  <view class="songlist_container">
+    <block wx:for-items="{{recommendSonglist}}" wx:key="index">
+      <template is="songlist_item" data="{{songlist:item,imgBase}}"></template>
+    </block>
+  </view>
+  <view class="recommend_title">热门排行</view>
+  <view bindtouchstart="touchS" bindtouchmove="touchM" bindtouchend="touchE">
+  <block wx:for="{{recommendSong}}" wx:key="index">
+    <template is="song_item" data="{{song:item, index:index}}"></template>
+  </block>
+  </view>
+  <view class="play_controller {{playController}}" catchtap="goPlayController">
+    <image src="/image/recommend/play_controller.png" catchtap="goPlayController"></image>
+  </view>
+</view>
+
+<template name="songlist_item">
+  <view class="songlist_item" catchtap="toSonglist" data-page="songlist" data-code="{{songlist.value}}">
+    <view class="songlist_img" style="{{'background-image:url(' + imgBase + songlist.linkImageUri + ')'}}" ></view>
+    <view class="songlist_desc">{{songlist.label}}</view>
+  </view>
+</template>
+<template name="song_item">
+  <view class="song_item_container" catchtap="chooseSong"  data-code="{{song.code}}" data-index="{{index}}" >
+    <view class="song_item {{song.move}}" data-index="{{index}}">
+      <text class="song_index" data-index="{{index}}">{{index + 1}}.</text>
+      <text class="song_name" data-index="{{index}}">{{song.name}}</text>
+      <text class="song_player" data-index="{{index}}">{{song.player}}</text>
+      <text data-index="{{index}}" data-fav="{{song.fav == true ? 'true' : 'false'}}" class="fav" catchtap="favSong">{{song.fav == true ? '已收藏' : '收藏'}}</text>
+    </view>
+  </view>
+</template>

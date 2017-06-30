@@ -1,0 +1,189 @@
+'use strict';
+import Promise from './es6-promise.min'
+
+module.exports = {
+    /*******************************************调试相关，发布前关闭*******************************************/
+    pageDebug: false,//false true
+    debug: false,
+    consoleDebug: false,
+    /***********************************************支付相关***************************************************/
+    //产品号
+    productId_order: 'blkg',
+    //订单号 需要去询问下健康的订购
+    channelId_order: 'weixinlp',
+    //订购渠道号
+    payChannelType_order: 'weixin.lp',
+    //获得用户订购状态
+    orderAuth: 'https://trade.lutongnet.com/v1/united/order/auth',
+    //orderAuth: 'http://trade.lutongnet.com:5000/v1/united/order/auth',
+    //下订单
+    orderUrl: "https://trade.lutongnet.com/v1/united/order/add",
+    //获得用户订购信息
+    orderStatus: 'https://trade.lutongnet.com/v1/united/order/unexpired-list',
+    //获得订购原价详情
+    orderList: 'https://trade.lutongnet.com/v1/united/order/get-order-config-list',
+    //获得订购价格详情
+    orderFeeList: 'https://trade.lutongnet.com/v1/united/order/get-discount-order-fee',
+    /**********************************************支付相关******************************************************/
+    CONNECTOR_SERVER: 'epg.blkg-mini-program.vas.lutongnet.com',
+    CONNECTOR_PORT: '3014',
+    //服务器地址
+    API_URL: 'https://epg.blkg-mini-program.vas.lutongnet.com/karaoke-api/',
+    // imgBase: "http://yuyan.tunnel.qydev.com/",
+    imgBase: 'http://cdn-h3-p1.vas.lutongnet.com/music_unlock/',
+    contextImgPath: 'http://cdn-h3-p1.vas.lutongnet.com/music_unlock/mini-program/image/',
+    /** 常量 **/
+    appVersion: 'A',
+    platform: "hw-20",
+    /************************************************接口***************************************************/
+    //获取城市信息
+    city_info: 'util/user-city-info',
+    top_access_songlist: 'mini-program/get-top-access-songlist',
+    top_vod_song: 'mini-program/get-top-vod-song',
+    add_song: 'mp/add-song',
+    remove_song: 'mp/remove-song',
+    top_song: 'mp/top-song',
+
+    get_song_list: 'mp/get-song-list',
+
+    /* 获取收藏的歌单*/
+    get_fav_song_list: 'favorites/songlist',
+    /* 获取收藏的歌曲*/
+    get_fav_song: 'favorites/song-list',
+    //添加收藏
+    add_fav: 'favorites/add',
+    remove_fav: 'favorites/remove',
+    //获取收藏列表
+    get_fav_value: 'favorites/get-value-list',
+    /* 是否收藏歌单，歌曲 */
+    is_fav: 'favorites/is-collected',
+    //获取epg
+    get_epg: 'epg/get',
+    //获取program
+    get_program: 'program/get',
+    get_songlist: 'songlist/get-songlist-info',
+    //获取playurl
+    get_playurl: 'mp/get-playurl',
+    //login
+    login: 'mini-program/login',
+    decodeUserInfo: 'mini-program/decode-user-info',
+    //发送弹幕
+    send_barrage: 'barrage/save-barrage',
+    //获取所有表情列表
+    get_expression_list: 'expression/list',
+    //发送表情
+    send_expression: 'interaction/add',
+
+    //上传文件
+    upload: 'upload/file',
+    //语音识别
+    recognition: 'mini-program/speech-recognition',
+    //百度语言识别
+    baidu: 'baidu/speech/recognition-base64',
+    text_search: 'search/get-name-song',
+    /************************************************接口***************************************************/
+
+    get(url) {
+        return new Promise((resolve, reject) => {
+            console.log(url)
+            wx.request({
+                url: url,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                success: function (res) {
+                    resolve(res)
+                },
+                fail: function (res) {
+                    reject(res)
+                }
+            })
+        })
+    },
+
+    post(url, data) {
+        var that = this;
+        if (that.consoleDebug) {
+            console.log("post发送......." + url);
+            console.log(data);
+        }
+        return new Promise((resolve, reject) => {
+            wx.request({
+                url: url,
+                data: data,
+                method: 'POST',
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Content-Type': 'application/json'
+                    // 'Content-Type': 'application/x-www-form-urlencode;charset=UTF-8;'
+                },
+                success: function (res) {
+                    if (that.consoleDebug) {
+                        console.log("post接收.........." + url);
+                        console.log(res);
+                    }
+                    resolve(res)
+                },
+                fail: function (res) {
+                    if (that.consoleDebug) {
+                        console.log("post返回失败.........." + url);
+                        console.log(res);
+                    }
+                    reject(res)
+                }
+            })
+        })
+    },
+    //记录访问日志
+    addAccessLog: function (userInfo, source, target, targetType) {
+        /*
+        var target = 'mini-program/songlist';
+        var targetType = 'column';
+        api.addAccessLog(app.globalData.userInfo, this.currentPage, target, targetType);
+        */
+        if (userInfo == undefined
+            || source == undefined
+            || target == undefined
+            || targetType == undefined) {
+            return;
+        }
+        var userid = userInfo.unionId;
+        var role = userInfo.role;
+        var orderType = userInfo.orderType;
+        if (userid == undefined
+            || role == undefined
+            || orderType == undefined) {
+            return;
+        }
+        //userid role orderType source target targetType
+        var miniProgram = 'mini';
+        this.post(this.API_URL + 'access/add', {
+            //cookie
+            "city": app.getCity(),
+            //cookie CARRIER 没有从config 读取
+            "carrier": miniProgram,
+            "appVersion": this.appVersion,
+            //getChannelCode 从cookie
+            "platform": this.channelId_order,
+            "userid": userid,
+            "role": role,
+            "orderType": orderType,
+            //来源页
+            "source": source,
+            //当前页
+            "target": target,
+            //当前页类型
+            "targetType": targetType,
+            //是否缓存 默认true 如果为false 则直接将记录插入数据库
+            "cachable": true,
+            //从参数中获取 没有则为 null
+            "integralStrategy": null,
+            //config 中读取"4.3.0"
+            "version": miniProgram,
+            //cookie  没有从config读取   "4.0.0"
+            "apkVersion": miniProgram,
+            // cookie"127.0.0.1"
+            "ip": app.getIp()
+        });
+    }
+};

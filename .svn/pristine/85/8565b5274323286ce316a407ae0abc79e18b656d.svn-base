@@ -1,0 +1,141 @@
+@import "../../component/toast/index.wxss";
+
+.bg {
+  filter:blur(50rpx) brightness(80%);
+  position: absolute;
+  width: 100%;
+  height: 422rpx;
+  z-index: -1;
+}
+
+.container {
+  -webkit-user-select: none;
+  user-select: none;
+  width: 100%;
+  overflow: hidden;
+}
+
+.info_thumb {
+  background-repeat: no-repeat;
+  background-size: 218rpx 294rpx;
+  background-position: 0rpx -20rpx;
+  width: 218rpx;
+  height: 218rpx;
+  top: 90rpx;
+  left: 30rpx;
+  position: absolute;
+}
+
+.info_detail {
+  height: 218rpx;
+  left: 274rpx;
+  top: 90rpx;
+  position: absolute;
+}
+
+.info {
+  overflow: hidden;
+  height: 422rpx;
+}
+
+.info_content {
+  width: 100%;
+}
+
+.info_detail .btn {
+  font-size: 30rpx;
+  color: white;
+}
+
+.title {
+  word-break: break-all;
+  font-size: 45rpx;
+  height: 104rpx;
+  color: white;
+}
+
+.play_all, .fav_songlist {
+  margin-top: 26rpx;
+  display: inline-block;
+}
+
+.fav_songlist {
+  margin-left: 34rpx;
+}
+
+.play_all image, .fav_songlist image {
+  width: 48rpx;
+  height: 48rpx;
+  margin-left: 36rpx;
+}
+
+.song_item {
+  width: 100%;
+  z-index: 10;
+  position: relative;
+  padding-left: 10rpx;
+}
+
+.fav {
+  position: absolute;
+  right: -155rpx;
+  z-index: -1;
+  background-color: red;
+  color: white;
+  height: 116rpx;
+  width: 166rpx;
+  text-align: center;
+}
+
+.song_index {
+}
+
+.song_name {
+  color: #3c4a55;
+}
+
+.song_player {
+  right: 23rpx;
+  position: absolute;
+  color: #bdc2d3;
+  font-size: 30rpx;
+}
+
+.song_item_container {
+  position: relative;
+  height: 116rpx;
+  border-bottom-width: 1rpx;
+  border-bottom-color: #e6eaf2;
+  border-bottom-style: solid;
+  line-height: 116rpx;
+}
+
+.slide {
+  animation: slideAnimation 0.3s ease;
+  animation-fill-mode: forwards;
+}
+
+.restore {
+  animation: restoreAnimation 0.3s ease;
+  animation-fill-mode: forwards;
+}
+
+@keyframes slideAnimation {
+  from {
+    margin-left: 0rpx;
+  }
+
+  to {
+    margin-left: -166rpx;
+  }
+}
+
+@keyframes restoreAnimation {
+  from {
+    margin-left: -166rpx;
+  }
+
+  to {
+    margin-left: 0rpx;
+  }
+}

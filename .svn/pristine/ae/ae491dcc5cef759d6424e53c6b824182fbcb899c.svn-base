@@ -1,0 +1,19 @@
+.text-item{
+ display: flex;
+ align-items: center;
+  border-bottom: 1px solid #e6eaf2;
+  padding: 38rpx;
+
+}
+
+.text{
+  color: #3c4a55;
+}
+
+page{
+  background-color: #fff
+}
+
+.hoverClass {
+  background-color: #f6f6f6;
+}

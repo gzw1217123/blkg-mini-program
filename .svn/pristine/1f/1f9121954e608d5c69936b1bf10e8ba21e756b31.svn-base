@@ -1,0 +1,78 @@
+### 相关文档
+	- [小程序开发官方文档](https://mp.weixin.qq.com/debug/wxadoc/dev/)
+	- [bindTap  可以传入相关参数](http://blog.csdn.net/beilinyu/article/details/53945438 )
+	- [样式](http://www.51xuediannao.com/html+css/htmlcssjq/display_flex.html)
+### 数据
+1. 用户数据
+  需要在应用进来的时候获取用户数据
+2. 数据获取
+  - api.post(api.API_URL + "epg/get", { code: "billboard", appVersion:"A"}).then(res => {
+      console.log(JSON.stringify(res));
+    })
+3. 跳转 
+  - 切换底部 tab 必须用  wx.switchTab({url: '/pages/profile/index',
+      success:function(r) {
+        console.log(JSON.stringify(r));
+      }, fail: function (r) {
+        console.log(JSON.stringify(r));
+      }
+  - navigateTo, redirectTo 只能打开非 tabBar 页面。
+  - switchTab 只能打开 tabBar 页面。
+  - reLaunch 可以打开任意页面。
+    页面底部的 tabBar 由页面决定，即只要是定义为 tabBar 的页面，底部都有 tabBar。
+    调用页面路由带的参数可以在目标页面的onLoad中获取。
+  - wx.navigateBack({}) 返回
+### 页面
+1. 推荐
+	- 推荐歌单 
+		- pic / default pic
+		- 获取排行前6的歌单
+		- 获取EPG 配置的歌单
+	- 推荐歌曲
+		- 点播量最高排名前20首歌曲
+		- 也可运营在后台配置歌曲
+	- 播放控制按钮
+	- 收藏歌曲
+2. 点歌
+3. 已点
+4. 我的
+	- 收藏歌曲
+		- 滑动取消收藏并删除
+	- 收藏歌单
+		- 滑动取消收藏并删除
+	- 开通会员
+5. 绑定页面
+
+6. 歌单详细页面
+7. 表情
+8. 弹幕
+
+- 备注
+	- 自定义toast 
+		- http://blog.csdn.net/michael_ouyang/article/details/60867679
+		- http://blog.csdn.net/eadio/article/details/54616595
+	- 滑动收藏 
+		- http://www.jianshu.com/p/07c4ddf8a3d3
+	- 1. 背景图：背景图为歌单图片的放大虚化图片；
+	- 调用订购接口
+
+- 可配置化
+	- 弹幕
+	- 推荐歌单
+	- 推荐歌曲
+	- 订购价格
+- 相关参数
+    String wxspAppid = "wx204478b921bd79ad";
+    //小程序的 app secret (在微信小程序管理后台获取)
+    String wxspSecret = "e3085662981d131c98f924c794a7503d";
+- 疑问
+	- "use strict";
+	- 小程序为什么有的地方没有用分好或是逗号分割
+	- 订购状态
+	- 添加用户信息解密接口
+	- 为什么需要加密 用户的  unionid ？
+	- 需要配置小程序通信域名
+	- 微信小程序 配置 
+    	- 扫普通链接二维码打开小程序
+    	- 附近的小程序
+    	- 消息推送

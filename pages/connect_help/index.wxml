@@ -1,0 +1,12 @@
+<view class="container">
+  <view class="step_1">
+    1.在TV端应用里找到“手机点歌-扫码连接”入口
+  </view>
+  <image class="step_1" src="{{imagePath + 'step_1.png'}}"></image>
+  <view class="step_2">
+    2.使用百灵助手“扫一扫”，扫描二维码，实现连接
+  </view>
+  <image class="step_2" src="{{imagePath + 'step_2.png'}}"></image>
+  <view class="scan" bindtap="scan">扫一扫</view>
+  <image src="{{imagePath + 'scan.png'}}" class="scan"></image>
+</view>

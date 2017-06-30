@@ -1,0 +1,92 @@
+@import "../../../component/toast/index.wxss";
+
+.container {
+  -webkit-user-select: none;
+  user-select: none;
+  width: 100%;
+  overflow: hidden;
+}
+
+.tip {
+  color: #99a4bf;
+  font-size: 28rpx;
+  width: 100%;
+  height: 100rpx;
+  line-height: 100rpx;
+  text-align: center;
+}
+
+.thumb {
+  background-repeat: no-repeat;
+  background-size: 110rpx 145rpx;
+  background-position: 0rpx -5rpx;
+  width: 110rpx;
+  height: 110rpx;
+  color: white;
+  position: absolute;
+  top: 6rpx;
+  left: 12rpx;
+}
+
+.song_item {
+  overflow: hidden;
+  width: 1000rpx;
+  height: 130rpx;
+  padding: 0;
+  position: relative;
+}
+
+.fav {
+  display: inline-block;
+  background-color: red;
+  color: white;
+  height: 130rpx;
+  width: 196rpx;
+  text-align: center;
+  line-height: 130rpx;
+  left: 750rpx;
+  position: absolute;
+}
+
+.song_name {
+  color: #3c4a55;
+  width: 630rpx;
+  height: 129rpx;
+  line-height: 129rpx;
+  position: absolute;
+  left: 150rpx;
+  font-size: 32rpx;
+  border-bottom-width: 1rpx;
+  border-bottom-color: #e6eaf2;
+  border-bottom-style: solid;
+}
+
+.slide {
+  animation: slideAnimation 0.3s ease;
+  animation-fill-mode: forwards;
+}
+
+.restore {
+  animation: restoreAnimation 0.3s ease;
+  animation-fill-mode: forwards;
+}
+
+@keyframes slideAnimation {
+  from {
+    margin-left: 0;
+  }
+
+  to {
+    margin-left: -195rpx;
+  }
+}
+
+@keyframes restoreAnimation {
+  from {
+    margin-left: -195rpx;
+  }
+
+  to {
+    margin-left: 0;
+  }
+}

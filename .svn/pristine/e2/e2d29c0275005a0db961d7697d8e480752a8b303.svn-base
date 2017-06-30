@@ -1,0 +1,8 @@
+
+
+<!-- 遍历对象 -->
+<view class="container">
+<view wx:for="{{random_barrages}}" wx:key="index" class="text-item" bindtap="sendBarrage" data-content="{{item}}" hover-class="hoverClass">
+<view class="text">{{item}}</view>
+</view>
+</view>

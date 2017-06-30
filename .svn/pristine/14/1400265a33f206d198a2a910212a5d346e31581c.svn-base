@@ -1,0 +1,22 @@
+<view class="slogan">一次订购，将客厅变K厅</view>
+<view>
+  <radio-group bindchange="radioChange">
+    <label class="item" wx:for="{{items}}" wx:key="{{item}}" data-ds="{{item.ds}}">
+      <view>
+        <text class="time">{{item.time}}</text>
+        <text class="fee">{{"￥"+(orderCode==0?item.discountFee/100:item.orderFee/100)}}</text>
+      </view>
+      <radio value="{{item.value}}" checked="{{item.checked}}" />
+    </label>
+  </radio-group>
+</view>
+<view class="userinfo">
+  <view class="textMax">支付总金额
+    <text class="red">{{"￥"+money/100}}</text>
+  </view>
+  <button bindtap="pay">立即支付</button>
+</view>
+<view class="serviceInfo">
+  <view class="textMin">订购成功后，即可用微信账号登陆</view>
+  <view class="textMin">OTT百灵K歌，体验家庭K歌的乐趣！</view>
+</view>

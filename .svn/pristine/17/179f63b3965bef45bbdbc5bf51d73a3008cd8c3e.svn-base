@@ -1,0 +1,48 @@
+view {
+  padding: 0;
+}
+
+image.step_1 {
+  width: 536rpx;
+  height: 296rpx;
+  margin-left: 106rpx;
+  margin-bottom: 112rpx;
+}
+
+image.step_2 {
+  width: 533rpx;
+  height: 232rpx;
+  margin-left: 106rpx;
+}
+
+view.step_1 {
+  margin-left: 30rpx;
+  margin-bottom: 98rpx;
+  margin-top: 42rpx;
+  font-size: 32rpx;
+}
+
+view.step_2 {
+  margin-left: 30rpx;
+  margin-bottom: 108rpx;
+  font-size: 32rpx;
+}
+
+view.scan {
+  background-color: #00bfff;
+  width: 100%;
+  position: absolute;
+  height: 100rpx;
+  bottom: 0;
+  text-align: center;
+  line-height: 100rpx;
+  color: white;
+}
+
+image.scan {
+  width: 22rpx;
+  height: 21rpx;
+  position: absolute;
+  bottom: 44rpx;
+  left: 289rpx;
+}

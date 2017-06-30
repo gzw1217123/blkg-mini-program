@@ -1,0 +1,304 @@
+var api = require('../../utils/api.js')
+var util = require('../../utils/util.js')
+// const io = require('../../utils/wx-socket-io-master.js')
+// var pomelo = require('../../utils/pomelo-client.js')
+var Connector = require('../../utils/connector-pomelo.js')
+var app = getApp()
+
+Page({
+  data: {
+
+    tabs: ['发表情', '发弹幕',],
+    stv: {
+      windowWidth: 0,
+      lineWidth: 0,
+      offset: 0,
+      tStart: false
+    },
+    activeTab: 0,
+    index1: 0,
+    /************************************************************ */
+    imgBase: api.imgBase,
+    loading: false,
+    loadtxt: '正在加载',
+    userInfo: {}, // 存放用户信息
+    currentTab: 0,
+    list_best: [],
+    list_newest: [],
+    currentPage_best: 1,
+    currentPage_newest: 1,
+    pageCount_best: 0,
+    pageCount_newest: 0,
+    menuitem: [{
+      currentpage: '0',
+      text: "发表情"
+    }, {
+      currentpage: '1',
+      text: "发弹幕"
+    }],
+    connector:{},
+    tv_id: '329670409FB67FBD'
+  },
+  /**
+  * 滑动切换tab
+  */
+  bindChange: function (e) {
+    this.setData({ currentTab: e.detail.current });
+  },
+
+  /**
+   * 点击tab切换
+   */
+  swichNav: function (e) {
+    var that = this;
+    if (this.data.currentTab === e.currentTarget.dataset.current) {
+      return false;
+    } else {
+      that.setData({
+        currentTab: e.currentTarget.dataset.current
+      })
+    }
+  },
+
+  notiFun: function (name, content) {
+    var type = name.type;
+    this.updata("newest", 0);
+    if (type == 0) {
+      this.updata("best", 0)
+    }
+    if (type == 1) {
+      this.setData({ currentTab: 1 });
+    }
+  },
+  firstIn: function (name, content) {
+
+    var that = this
+    that.setData({
+      userInfo: name.userInfoTmp,
+    })
+    that.updata("best", 0)
+    that.updata("newest", 0)
+
+  },
+  onLoad: function (options) {
+
+    //pomelo.Connector('120.25.158.242', 3014);
+
+    var that = this;
+    var phone_id ='test';
+    //var connector = new Connector('120.25.158.242', '3014');
+    var connector = new Connector('weixin-ott-kalaok.lutongnet.com', '3014');
+    this.data.connector = connector;
+
+    connector.on('connect', function () {
+      connector.login(phone_id, function (data) {
+        if (data.code === 200) {
+          console.log('登录成功！');
+          that.afterConnect();
+        }
+        else {
+          util.alert("您的网络异常,登录失败");
+        }
+
+      });
+    });
+
+  },
+  //连接后的操作
+  afterConnect: function() {
+    var that = this;
+    var connector = this.data.connector;
+    
+    connector.getUserInfo(that.data.tv_id, function (data) {
+
+      if (data.isOnline == false) {
+        console.log('您的电视不在互动状态哦，即将自动退出播控页面');
+
+        // setStorage("userID", phone_id);
+        // deleteStorage("room_id");
+        // deleteStorage("hudong_id");
+        // setTimeout(function () {
+        //   location.href = "index.html";
+        // }, 2000);
+
+      }
+      else {
+        console.log('查询电视状态');
+        connector.sendMessage("@" + that.data.tv_id, "getTVPage", "");
+      }
+    });
+
+    connector.on('disconnect', function (data) {
+      console.log('与服务器连接中断！');
+    });
+    connector.on('onUserSendMessage', function (data) {
+      if (data.from === connector.uid) return; // 屏蔽自己发来的消息
+      console.log('收到消息：', data.message);
+      //log(data.from + ':' + data.message.content);
+    });
+
+
+    connector.on('onUserLogin', function (data) { }); // 用户登录时触发
+    connector.on('onUserLogout', function (data) { }); // 用户退出时触发
+    connector.on('onUserJoinRoom', function (data) { }); // 用户进入房间时触发
+    connector.on('onUserLeaveRoom', function (data) { }); // 用户离开房间时触发
+
+  },
+  onReachBottom: function () {
+    this.bindscrolltolower();
+  },
+  /**
+  * 下滑
+  */
+  bindscrolltolower() {
+    switch (this.data.currentTab) {
+      case 0:
+        this.updata("best", 1)
+        break
+      case 1:
+        this.updata("newest", 1)
+        break
+    }
+  },
+  /**
+* 下拉刷新
+*/
+  onPullDownRefresh() {
+    var currentTab = this.data.currentTab;
+    var model = "best"
+    if (currentTab == 1) {
+      model = "newest"
+    }
+    this.updata(model, 0)
+  },
+
+  /**
+    * 数据更新（追加或重置）
+    */
+  updata(type, mold) {
+
+  },
+ toPage: function (e) {
+    var page = e.currentTarget.dataset.page;
+    if (page == "addDyranic")
+      this.setData({
+        currentTab: 1
+      })
+    util.toPage(e, 1);
+
+  },
+  previewImg: function (e) {
+    api.previewImg(e);
+  },
+
+  onShareAppMessage: function () {
+    return {
+      title: '幸福健身团',
+      desc: '专属您的健身专家',
+      path: '/pages/community',
+      success: function (res) {
+        // 转发成功
+        console.log(res.shareTickets[0]);
+        wx.getShareInfo({
+          shareTicket: res.shareTickets[0],
+          success(res) {
+            console.log(res);
+          }
+        })
+      },
+    }
+  },
+  toDetailPage: function (e) {
+    var data = e.currentTarget.dataset
+    var toDetail = data.todetail;
+    if (toDetail == "todetail") {
+      this.toPage(e);
+    }
+  },
+  /************************************************************ */
+  onLoadOther: function () {
+    try {
+      let {tabs} = this.data;
+      var res = wx.getSystemInfoSync()
+      this.windowWidth = res.windowWidth;
+      this.data.stv.lineWidth = this.windowWidth / this.data.tabs.length;
+      this.data.stv.windowWidth = res.windowWidth;
+      this.setData({ stv: this.data.stv })
+      this.tabsCount = tabs.length;
+    } catch (e) {
+    }
+  },
+  _updateSelectedPage(page) {
+    let {tabs, stv, activeTab} = this.data;
+    activeTab = page;
+    this.setData({ activeTab: activeTab })
+    stv.offset = stv.windowWidth * activeTab;
+    this.setData({ stv: this.data.stv })
+  },
+  //跳转页面
+  handlerTabTap(e) { 
+    console.log("当前index:" + e.currentTarget.dataset.index);
+    var index = e.currentTarget.dataset.index;
+    var data = e.currentTarget.dataset;
+    if(index === 0 ){
+      data.page = "expression";
+      util.toPage(e, 1);
+    }else if(index === 1){
+      data.page = "danmu/customed";
+      util.toPage(e, 1);
+    }
+  },
+  playControl: function (e) {
+    var conntrolType = e.currentTarget.dataset.type;
+
+
+    switch (conntrolType) {
+      case 'nextSong'://下一首
+        this.data.connector.sendMessage('@' + this.data.tv_id, 'control', 'next');
+        break;
+      case 'replay'://重播
+        this.data.connector.sendMessage("@" + this.data.tv_id, "control", "replay");
+        break;
+      case 'playOrPause'://暂停或播放
+        this.data.connector.sendMessage("@" + this.data.tv_id, "control", "play_pause");
+        break;
+      case 'accompanyOrOrginal'://原伴唱切换
+        this.data.connector.sendMessage("@" + this.data.tv_id, "control", "yuan_ban");
+        break;
+      case 'volUp'://声音调大
+        this.data.connector.sendMessage("@" + this.data.tv_id, "control", "vol_up");
+        break;
+      case 'volDown'://声音调小
+        this.data.connector.sendMessage("@" + this.data.tv_id, "control", "vol_down");
+        break;
+      default:
+        util.alert('出错了')
+    }
+    
+  }
+ /* //下一首
+  nextSong: function () {
+    this.data.connector.sendMessage('@' + this.data.tv_id, 'control', 'next');
+  },
+  //重播
+  replay: function() {
+    this.data.connector.sendMessage("@" + this.data.tv_id, "control", "replay");
+  },
+  //暂停或播放
+  playOrPause: function() {
+    this.data.connector.sendMessage("@" + this.data.tv_id, "control", "play_pause");
+  },
+  //原伴唱切换
+  accompanyOrOrginal: function() {
+    this.data.connector.sendMessage("@" + this.data.tv_id, "control", "yuan_ban");
+  },
+  //声音调大
+  volUp: function() {
+    this.data.connector.sendMessage("@" + this.data.tv_id, "control", "vol_up");
+  },
+  //声音调小
+  volDown: function () {
+    this.data.connector.sendMessage("@" + this.data.tv_id, "control", "vol_down");
+  }
+*/
+})

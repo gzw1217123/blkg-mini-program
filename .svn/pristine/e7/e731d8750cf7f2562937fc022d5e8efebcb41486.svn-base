@@ -1,0 +1,61 @@
+{
+  "pages": [
+    "pages/recommend/index",
+    "pages/choose_song/index",
+    "pages/song_selected/index",
+    "pages/profile/index",
+    "pages/order/index",
+    "pages/fav/song/index",
+    "pages/fav/songlist/index",
+    "pages/songlist/index",
+    "pages/connect_help/index",
+    "pages/play_controller/index",
+    "pages/expression/index",
+    "pages/danmu/customed/index",
+    "pages/danmu/default/index",
+    "pages/swiper/index",
+    "pages/demo/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#3abcff",
+    "navigationBarTextStyle": "#fff",
+    "navigationBarTitleText": "百灵助手",
+    "backgroundTextStyle": "white",
+    "backgroundColor": "#f6f6f6",
+    "enablePullDownRefresh": false
+  },
+
+  "tabBar": {
+    "color": "#7a7e83",
+    "selectedColor": "#3abcff",
+    "borderStyle": "black",
+    "backgroundColor": "#f6f6f6",
+    "list": [
+      {
+        "pagePath": "pages/recommend/index",
+        "iconPath": "image/app/icon/recommend.png",
+        "selectedIconPath": "image/app/icon/recommend_f.png",
+        "text": "推荐"
+      },
+      {
+        "pagePath": "pages/choose_song/index",
+        "iconPath": "image/app/icon/choose_song.png",
+        "selectedIconPath": "image/app/icon/choose_song_f.png",
+        "text": "点歌"
+      },
+      {
+        "pagePath": "pages/song_selected/index",
+        "iconPath": "image/app/icon/selected_song.png",
+        "selectedIconPath": "image/app/icon/selected_song_f.png",
+        "text": "已点"
+      },
+	  {
+        "pagePath": "pages/profile/index",
+        "iconPath": "image/app/icon/profile.png",
+        "selectedIconPath": "image/app/icon/profile_f.png",
+        "text": "我的"
+      }
+    ]
+  },
+  "debug": false
+}

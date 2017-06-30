@@ -1,0 +1,419 @@
+//input.js
+var api = require('../../utils/api.js')
+var util = require('../../utils/util.js')
+var slide = require('../../utils/slide.js')
+var toast = require('../../component/toast/index.js')
+var app = getApp();
+
+Page({
+  data: {
+    flag: 1,
+    focus: false,
+    plain: false,
+    inputValue: '',
+    recordFileName:'humntest',
+    title:"推荐歌曲"
+  },
+  filepath: "",
+  cancelSearch:0,
+  getRecommendSong: function () {
+    var that = this;
+    var epg = this.data.epg;
+    if (epg
+      && epg.groupList[0]
+      && epg.groupList[0].metadataList[0]
+      && epg.groupList[0].metadataList[0].value) {
+      var id = epg.groupList[0].metadataList[0].value;
+      api.post(api.API_URL + api.get_program, {
+        "id": id,
+        "pageable": true,
+        "current": 1,
+        "pageSize": 20
+      }).then(res => {
+        if (res.statusCode == 200
+          && res.data && res.data.pb && res.data.pb.dataList) {
+          var recommendSong = res.data.pb.dataList;
+          that.setData({
+            recommendSong: recommendSong
+          });
+          console.log("app.globalData.userInfo:" + JSON.stringify(app.globalData.userInfo));
+          app.onLogined(this, "initFavData");
+        }
+      })
+    }
+  },
+  initFavData: function (loginData) {
+    if (loginData && loginData.userInfo) {
+      this.setData({
+        userInfo: loginData.userInfo
+      });
+      this.getFavAndSelectedData();
+    }
+  },
+  getFavAndSelectedData: function () {
+    var that = this;
+    api.post(api.API_URL + api.get_fav_value, {
+      "appVersion": api.appVersion,
+      "userid": that.data.userInfo.unionId,
+      "role": that.data.userInfo.role,
+      "type": "song",
+      "pageable": false
+    }).then(res => {
+      if (res.statusCode == 200 && res.data
+        && res.data.valueList) {
+        var valueList = res.data.valueList;
+        var valueStr = '';
+        for (var value in valueList) {
+          valueStr += valueList[value] + ';';
+        }
+        if (app.globalData.connected == true
+          && app.globalData.connectedInfo.unionId
+          && app.globalData.connectedInfo.role) {
+          api.post(api.API_URL + api.get_song_list, {
+            "userid": app.globalData.connectedInfo.unionId,
+            "role": app.globalData.connectedInfo.role,
+            "mp": "default",
+            "current": 1,
+            "pageSize": 1000
+          }).then(res => {
+            if (res.statusCode == 200 && res.data
+              && res.data.pb.dataList) {
+              var chosenData = res.data.pb.dataList;
+              var chosenStr = '';
+              for (var value in chosenData) {
+                chosenStr += chosenData[value].code + ';';
+              }
+              that.setFavAndChosenData(valueStr, chosenStr);
+            }
+          });
+        } else {
+          that.setFavAndChosenData(valueStr);
+
+        }
+      }
+    });
+  },
+  checkFav: function () {
+    var that = this;
+    api.post(api.API_URL + api.is_fav, {
+      "userid": that.data.userInfo.unionId,
+      "role": that.data.userInfo.role,
+      "appVersion": config.appVersion,
+      "type": "songlist",
+      "code": that.data.code
+    }).then(res => {
+      if (res.statusCode == 200 && res.data && res.data.collected === true) {
+        that.setData({ isFav: res.data.collected });
+      }
+    });
+  },
+  setFavAndChosenData: function (valueStr, chosenStr) {
+    var recommendSong = this.data.recommendSong;
+    for (var song in recommendSong) {
+      if (valueStr && valueStr.indexOf(recommendSong[song].code) > -1) {
+        recommendSong[song].fav = true;
+      } else {
+        recommendSong[song].fav = false;
+      }
+      if (chosenStr && chosenStr.indexOf(recommendSong[song].code) > -1) {
+        recommendSong[song].selected = true;
+      } else {
+        recommendSong[song].selected = false;
+      }
+    }
+    this.setData({
+      recommendSong: recommendSong
+    });
+  },
+
+  cancel:function(){
+    var that = this;
+    
+    console.log(that.data.flag);
+    that.setData({flag:1});
+    wx.stopRecord();
+  },
+  ok:function(){
+    var that = this;
+    that.cancelSearch = 1;
+    console.log(that.data.flag);
+    that.setData({ flag: 1 });
+    wx.stopRecord();
+  },
+  speechSearch:function() {
+    this.setData({ flag: 0 });
+    var that = this;
+    wx.startRecord({
+      success: function (res) {       
+       // console.debug('success:' + res);
+        var filepath = res.tempFilePath;
+        if (1 != that.cancelSearch) {
+          return;
+        }
+        that.cancelSearch = 0;
+        wx.showLoading({
+          title: '搜索中',
+        })
+
+        //上传图片的位置
+        var path = "resources/upload/records/";
+        var recordFileName = "humhhhh" + Date.parse(new Date());
+        wx.uploadFile({
+          url: api.API_URL + api.upload, //仅为示例，非真实的接口地址
+          filePath: filepath,
+          name: 'file',
+          formData: {
+            "path": path,
+            "filename": recordFileName
+          },
+          success: function (res) {
+            var data = res.data;
+            var baidudata = {
+              "speech": "/mnt/server/silk-v3-decoder-master/inotify_decoder/wav/" + recordFileName + ".wav",
+              "name": "",
+              "appVersion": "A",
+              "platform": "hw-20",
+              "blkg_format": "ts-hd",
+              "current": 1,
+              "pageSize": 20
+            };
+
+            setTimeout(function () {
+              var dat = api.post(api.API_URL + api.recognition, baidudata).then(res => {
+                wx.hideLoading()
+
+                if (res.statusCode == 200 && res.data && res.data.pb) {
+                  that.setData({
+                    recommendSong: res.data.pb.dataList,
+                    inputValue: res.data.text,
+                    title: "搜索结果:"
+                  });
+                  console.log("res.data.pb.dataList:" + JSON.stringify(res.data.pb.dataList));
+                }
+                else {
+                  that.setData({
+                    title: "搜索结果:没有找到相关的歌曲.",
+                    inputValue: res.data.text,
+                    recommendSong: "",
+                  });
+                }
+              });
+
+            }, 200)
+            console.debug('ressuccessuploadFile:' + data);
+          }
+        })
+      }
+    })
+      },
+      fail: function (res) {
+        var test = JSON.stringify(res);
+        console.debug('fail:' + test);
+      },
+      complete: function (res) {
+        var that = this;
+
+  },
+  textSearch:function(e) {
+    console.log(e.detail.value);
+    var that = this;
+
+      var textSearchData = {
+        "name": e.detail.value,
+        "appVersion": "A",
+        "platform":"hw-20",
+        "format":"ts-hd",
+        "current":1,
+        "pageSize":300
+      }
+      api.post(api.API_URL + api.text_search, textSearchData).then(res => {
+        if (res.statusCode == 200 && res.data && res.data.pb && res.data.pb.dataList > 0) {
+          that.setData({
+            recommendSong: res.data.pb.dataList,
+            title:"搜索结果:"
+          });
+          console.log("res.data.pb.dataList:" + JSON.stringify(res.data.pb.dataList));
+        }
+        else
+        {
+          that.setData({
+            title: "搜索结果:没有找到相关的歌曲.",
+            recommendSong: "",
+          });
+        }
+      });
+    
+  },
+  onLoad: function (options) {
+    var that = this;
+    api.post(api.API_URL + api.get_epg, { code: "xcx_search_recommend", appVersion: "A" }).then(res => {
+      if (res.statusCode == 200 && res.data && res.data.epg) {
+        that.setData({
+          epg: res.data.epg
+        });
+        that.getRecommendSong();
+        console.log(JSON.stringify(res.data.epg));
+      }
+    });
+  },
+  onShow: function () {
+    this.setData({ connected: app.globalData.connected });
+    if (this.data.userInfo && this.data.userInfo.unionId) {
+      this.getFavAndSelectedData();
+    }
+    slide.bindPage(this, 'recommendSong');
+    toast.bindPage(this);
+    app.setLastTab('/pages/choose_song/index');
+  },
+  //收藏
+  favSong: function (e) {
+    var that = this;
+    var fav = e.currentTarget.dataset.fav;
+    var index = e.currentTarget.dataset.index;
+    if (new Date() - that.data.recommendSong[index].lastTimeStamp < 2000) {
+      toast.showToast('亲你点的太快了！', 2000);
+      return;
+    }
+    if (fav == 'true') {
+      if (index > -1 && that.data.recommendSong[index].code) {
+        api.post(api.API_URL + api.remove_fav, {
+          "userid": that.data.userInfo.unionId,
+          "role": that.data.userInfo.role,
+          "type": "song",
+          "value": that.data.recommendSong[index].code,
+          "appVersion": api.appVersion
+        }).then(res => {
+          if (res.statusCode == 200 && res.data) {
+            console.log(JSON.stringify(res.data));
+            that.data.recommendSong[index].fav = false;
+            this.setData({ recommendSong: that.data.recommendSong });
+            toast.showToast('取消收藏成功', 3000);
+          }
+        });
+      } else {
+        toast.showToast('取消收藏失败', 3000);
+      }
+    } else {
+      if (index > -1 && that.data.recommendSong[index].code) {
+        api.post(api.API_URL + api.add_fav, {
+          "userid": that.data.userInfo.unionId,
+          "role": that.data.userInfo.role,
+          "orderType": that.data.userInfo.orderType,
+          "type": "song",
+          "value": that.data.recommendSong[index].code,
+          "appVersion": api.appVersion
+        }).then(res => {
+          if (res.statusCode == 200 && res.data) {
+            console.log(JSON.stringify(res.data));
+            that.data.recommendSong[index].fav = true;
+            this.setData({ recommendSong: that.data.recommendSong });
+            toast.showToast('收藏成功', 3000);
+          }
+        });
+      } else {
+        toast.showToast('收藏失败', 3000);
+      }
+    }
+    that.data.recommendSong[index].lastTimeStamp = new Date();
+  },
+  goConnect: function (e) {
+    slide.clearSlide(this);
+    wx.navigateTo({
+      url: '/pages/connect_help/index'
+    });
+  },
+  //点歌
+  chooseSong: function (e) {
+    var that = this;
+    var index = e.currentTarget.dataset.index;
+    if (slide.canClickItem(index, this) !== true) {
+      return;
+    }
+    var connected = app.globalData.connected;
+    if (connected === true) {
+      var index = e.currentTarget.dataset.index;
+      var recommendSong = this.data.recommendSong;
+      if (recommendSong && recommendSong[index] && recommendSong[index].selected !== true) {
+        api.post(api.API_URL + api.add_song, {
+          "userid": app.globalData.connectedInfo.unionId,
+          "role": app.globalData.connectedInfo.role,
+          "mp": "default",
+          "code": recommendSong[index].code,
+          "source": "mini-program/recommend",
+          "sourceType": "column",
+          "metadataType": "program",
+          //业务中设置默认true
+          "charge": true,
+          //业务中设置默认true
+          "dolog": true,
+          //业务中设置默认true
+          "cachable": true,
+          "enablePrevNext": false,
+          "andPlay": false,
+          "display": "fullscreen",
+          "mode": "listCycleOnce",
+          "menu": "",
+          "toTop": true
+        }).then(res => {
+          if (res.statusCode == 200 && res.data) {
+            if (res.data.code == 0) {
+              console.log(JSON.stringify(res.data));
+              that.data.recommendSong[index].selected = true;
+              this.setData({ recommendSong: that.data.recommendSong });
+              toast.showToast('加入已点成功', 3000);
+            } else {
+              toast.showToast(res.data.text, 3000);
+            }
+          } else {
+            toast.showToast('加入已点失败', 3000);
+          }
+        });
+      } else {
+        toast.showToast('该歌曲已经加入已点列表', 3000);
+      }
+    } else {
+      this.goConnect();
+    }
+  },
+  touchS: function (e) {
+    slide.touchS(e, this);
+  },
+  touchM: function (e) {
+    slide.touchM(e, this);
+  },
+  touchE: function (e) {
+    slide.touchE(e, this);
+  },
+  globalTap: function (e) {
+    slide.clearSlide(this);
+  },
+  touchGlobalS: function (e) {
+    if (e.touches.length == 1) {
+      this.setData({
+        //设置触摸起始点水平方向位置
+        startGlobalX: e.touches[0].clientX,
+        startGlobalY: e.touches[0].clientY
+      });
+    }
+  },
+  touchGlobalM: function (e) {
+    if (e.touches.length == 1) {
+      //手指移动时水平方向位置
+      var moveX = e.touches[0].clientX;
+      var moveY = e.touches[0].clientY;
+      var disX = this.data.startGlobalX - moveX;
+      var disY = this.data.startGlobalY - moveY;
+      var playController = this.data.playController;
+      //垂直滑动距离小于30直接返回
+      if (disY > 30 && playController != 'hide') {
+        console.log(disY);
+        playController = 'hide';
+        this.setData({ playController: playController });
+      } else if (disY < -30 && playController != 'display') {
+        console.log(disY);
+        playController = 'display';
+        this.setData({ playController: playController });
+      }
+    }
+  },
+})

@@ -1,0 +1,4 @@
+<!-- 遍历对象 -->
+<view wx:for-items="{{userinfo}}" wx:key="index">
+<view>{{index}}:{{item}}</view>
+</view>

@@ -1,0 +1,34 @@
+var api = require('../../utils/api.js')
+var util = require('../../utils/util.js')
+var app = getApp()
+
+Page({
+
+  data: {
+      imagePath: api.contextImgPath + 'connect_help/'
+  },
+  scan: function() {
+      wx.scanCode({
+          onlyFromCamera: true,
+          success: (res) => {
+              console.log(res)
+          },
+          fail: (res) => {
+              console.error(res);
+          }
+      });
+  },
+  onReady: function() {
+    // Do something when page ready.
+  },
+  onShow: function() {
+
+  },
+  onPullDownRefresh: function() {
+    // Do something when pull down.
+  },
+  onReachBottom: function() {
+    // Do something when page reach bottom.
+	//this.bindscrolltolower();
+  }
+})

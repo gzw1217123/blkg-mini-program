@@ -1,0 +1,158 @@
+@import "../../component/toast/index.wxss";
+.container {
+  -webkit-user-select: none;
+  user-select: none;
+  width: 100%;
+  overflow: hidden;
+}
+.circle {
+position: relative;
+left: 20rpx;
+top: 20rpx;
+background: #f1f1f1 none repeat scroll 0 0;
+height: 60rpx;
+width: 710rpx;
+border-radius:30rpx
+}
+.search {
+position: absolute;
+left: 22rpx;
+top: 14rpx;
+}
+.search_text {
+  position: absolute;
+left: 75rpx;
+top:-10rpx;
+width:550rpx;
+height:80rpx;
+text-align:left;
+}
+.speech_btn {
+position: absolute;
+width: 30rpx;
+height: 40rpx;
+background-color: #eeeeee;
+}
+.speech_btn_div {
+position: absolute;
+left: 660rpx;
+top: 12rpx;
+width: 50rpx;
+height: 70rpx;
+
+}
+
+.cancel {
+position: absolute;
+z-index:102;
+left: 0rpx;
+top: 0rpx;
+width: 750rpx;
+height: 1200rpx;
+}
+.ok {
+position: absolute;
+z-index:103;
+left: 380rpx;
+top: 715rpx;
+width: 315rpx;
+height: 100rpx;
+}
+.hide{
+    display:none
+}
+.recommend_title {
+  position: relative;
+  left: 30rpx;
+  top: 80rpx;
+}
+
+.song_item_container {
+  position: relative;
+  top: 100rpx;
+  left:30rpx;
+  height: 116rpx;
+  border-bottom-width: 1rpx;
+  border-bottom-color: #e6eaf2;
+  border-bottom-style: solid;
+  line-height: 116rpx;
+}
+.slide {
+  animation: slideAnimation 0.3s ease;
+  animation-fill-mode: forwards;
+}
+
+.restore {
+  animation: restoreAnimation 0.3s ease;
+  animation-fill-mode: forwards;
+}
+
+@keyframes slideAnimation {
+  from {
+    margin-left: 0rpx;
+  }
+
+  to {
+    margin-left: -166rpx;
+  }
+}
+
+@keyframes restoreAnimation {
+  from {
+    margin-left: -166rpx;
+  }
+
+  to {
+    margin-left: 0rpx;
+  }
+}
+.song_name {
+  color: #3c4a55;
+}
+
+.song_player {
+  right: 55rpx;
+  position: absolute;
+  color: #bdc2d3;
+  font-size: 30rpx;
+}
+.song_item {
+  width: 100%;
+  z-index: 10;
+  position: relative;
+  padding-left: 10rpx;
+}
+
+.fav {
+  position: absolute;
+  right: -155rpx;
+  z-index: -1;
+  background-color: red;
+  color: white;
+  height: 116rpx;
+  width: 166rpx;
+  text-align: center;
+}
+.speech {
+position: absolute; 
+z-index:100;
+left: 0rpx;
+top: -1rpx;
+width: 750rpx;
+height: 1200rpx;
+}
+/**光圈动画**/
+.single em{width:75rpx;height:133rpx; margin:0 auto;cursor:pointer;display:block;position:absolute;z-index:100;}
+.single em:after { content: ''; position: absolute; width: 240rpx; height: 240rpx; border-radius: 50%; box-shadow: 0 0 10rpx 38rpx rgb(3, 169, 244);
+ top: 299%; left: 508%; margin-top: -120rpx; margin-left: -120rpx; z-index: 3; opacity: 0; -webkit-animation: halo 1s 0.1s infinite ease-out; 
+  animation: halo 1s 0.1s infinite ease-out; }
+@-webkit-keyframes halo { 
+0% { opacity: 1; transform: scale(0.6); }
+50% {opacity: 0.5;transform: scale(0.8); }
+70% {opacity: 0.3;transform: scale(1.0); }
+100%{opacity: 0;transform: scale(1.2); } }
+@keyframes halo {
+0% { opacity: 1; transform: scale(0.6); }
+50% {opacity: 0.5;transform: scale(0.8); }
+70% {opacity: 0.3;transform: scale(1.0); }
+100%{opacity: 0;transform: scale(1.2); } }

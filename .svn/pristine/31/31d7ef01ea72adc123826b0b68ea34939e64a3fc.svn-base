@@ -1,0 +1,186 @@
+@import "../../component/toast/index.wxss";
+
+.container {
+  -webkit-user-select: none;
+  user-select: none;
+  width: 100%;
+  height:100%;
+  overflow-x: hidden;
+}
+.play_controller {
+    width: 138rpx;
+    height: 138rpx;
+    position: fixed;
+    left: 306rpx;
+    top: 85%;
+    z-index: 1000;
+}
+.play_controller image {
+    width: 138rpx;
+    height: 138rpx;
+}
+
+.hide {
+  animation: hideAnimation 0.3s ease;
+  animation-fill-mode: forwards;
+}
+
+.display {
+  animation: displayAnimation 0.3s ease;
+  animation-fill-mode: forwards;
+}
+@keyframes hideAnimation {
+  from {
+    top: 85%;
+  }
+
+  to {
+    top: 100%;
+  }
+}
+
+@keyframes displayAnimation {
+  from {
+    top: 100%;
+  }
+
+  to {
+    top: 85%;
+  }
+}
+
+.connect_tip {
+  width: 100%;
+  height: 60rpx;
+  background-color: rgba(10, 10, 10, 0.8);
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.connect_tip .tip {
+  font-size: 30rpx;
+  margin-left: 40rpx;
+  color: white;
+  /*position: absolute;*/
+}
+
+.connect_tip .tip_icon {
+  /* position: absolute;*/
+  margin-right: 10px;
+  width: 44rpx;
+  height: 20rpx;
+  vertical-align: middle;
+}
+
+.recommend_title {
+  border-left: 10rpx solid #03a9fc;
+  height: 80rpx;
+  font-size: 40rpx;
+  line-height: 80rpx;
+  padding-left: 30rpx;
+  background-color: #f7f9fc;
+  color: #3c4a55;
+}
+
+.songlist_desc {
+  font-size: 26rpx;
+  width: 210rpx;
+  height: 60rpx;
+  text-align: left;
+  color: #3c4a55;
+  line-height: 30rpx;
+  margin-top: 10rpx;
+}
+
+.songlist_img {
+  width: 218rpx;
+  height: 218rpx;
+  background-repeat: no-repeat;
+  background-size: 218rpx 294rpx;
+  background-position: 0rpx -20rpx;
+}
+
+.songlist_container {
+  justify-content: space-around;
+  display: flex;
+  flex-flow: row wrap;
+  margin-bottom: 35rpx;
+  margin-top: 35rpx;
+}
+
+.songlist_item {
+  width: 218rpx;
+  margin-bottom: 30rpx;
+}
+
+.song_item {
+  width: 100%;
+  z-index: 10;
+  position: relative;
+  padding-left: 10rpx;
+}
+
+.fav {
+  position: absolute;
+  right: -155rpx;
+  z-index: -1;
+  background-color: red;
+  color: white;
+  height: 116rpx;
+  width: 166rpx;
+  text-align: center;
+}
+
+.song_name {
+  color: #3c4a55;
+}
+
+.song_player {
+  right: 23rpx;
+  position: absolute;
+  color: #bdc2d3;
+  font-size: 30rpx;
+}
+
+.song_item_container {
+  position: relative;
+  height: 116rpx;
+  border-bottom-width: 1rpx;
+  border-bottom-color: #e6eaf2;
+  border-bottom-style: solid;
+  line-height: 116rpx;
+}
+
+.slide {
+  animation: slideAnimation 0.3s ease;
+  animation-fill-mode: forwards;
+}
+
+.restore {
+  animation: restoreAnimation 0.3s ease;
+  animation-fill-mode: forwards;
+}
+
+@keyframes slideAnimation {
+  from {
+    margin-left: 0rpx;
+  }
+
+  to {
+    margin-left: -166rpx;
+  }
+}
+
+@keyframes restoreAnimation {
+  from {
+    margin-left: -166rpx;
+  }
+
+  to {
+    margin-left: 0rpx;
+  }
+}
+
+

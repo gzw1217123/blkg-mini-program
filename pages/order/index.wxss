@@ -1,0 +1,82 @@
+page {
+  background-color: #f2f4f7;
+}
+
+.slogan {
+  height: 100rpx;
+  line-height: 100rpx;
+  padding-left: 30rpx;
+  font-size: 28rpx;
+  color: #99a4bf;
+}
+
+.time {
+  color: #3c4a55;
+  font-size: 32rpx;
+}
+
+.fee {
+  color: #03a9f4;
+  font-size: 26rpx;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  height: 50px;
+  line-height: 100rpx;
+  background-color: #fff;
+  padding: 0 30rpx;
+}
+
+.textMax {
+  font-size: 40rpx;
+  margin-top: 84rpx;
+  margin-bottom: 74rpx;
+}
+
+.textMax2 {
+  font-size: 33rpx;
+  color: #333;
+}
+
+.textMin {
+  font-size: 26rpx;
+  color: #74a7bf;
+}
+
+.textMin2 {
+  display: flex;
+  font-size: 26rpx;
+  color: #b2b2b2;
+  flex-direction: column-reverse;
+  height: 40rpx;
+}
+
+.user {
+  margin: 0 0 100rpx 0;
+}
+
+.userinfo {
+  display: flex;
+  flex-direction: column;
+  padding: 20rpx 0 50rpx 0;
+  align-items: center;
+  background: #fff;
+  margin: 0rpx;
+}
+
+.serviceInfo {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  bottom: 20rpx;
+  width: 100%;
+  align-items: center;
+}
+
+button {
+  color: #fff;
+  background-color: #03a9f4;
+  width: 675rpx;
+}

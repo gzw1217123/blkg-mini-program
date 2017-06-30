@@ -1,0 +1,48 @@
+var api = require('../../utils/api.js')
+var util = require('../../utils/util.js')
+var app = getApp()
+
+Page({
+
+  data: {
+      imagePath: api.contextImgPath + 'connect_help/'
+  },
+  scan: function() {
+      wx.scanCode({
+          onlyFromCamera: true,
+          success: (res) => {
+              if (res.result) {
+                  var params = res.result.split('&');
+                  console.log(JSON.stringify(params));
+                  if(params.length == 3) {
+                      app.globalData.connectedInfo.unionId = params[0];
+                      app.globalData.connectedInfo.role = params[1];
+                      app.globalData.connectedInfo.tv_id = params[2];
+                      app.globalData.connected = true;
+                      console.log(app.globalData.connectedInfo);
+                      util.alert('连接成功');
+                      setTimeout(function(){wx.navigateBack()}, 1000);
+                  } else {
+                      util.alert('连接失败');
+                  }
+              }
+          },
+          fail: (res) => {
+              util.alert('连接失败');
+          }
+      });
+  },
+  onReady: function() {
+    // Do something when page ready.
+  },
+  onShow: function() {
+
+  },
+  onPullDownRefresh: function() {
+    // Do something when pull down.
+  },
+  onReachBottom: function() {
+    // Do something when page reach bottom.
+	//this.bindscrolltolower();
+  }
+})

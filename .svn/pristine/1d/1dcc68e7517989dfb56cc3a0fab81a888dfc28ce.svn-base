@@ -1,0 +1,20 @@
+<include src="../../component/toast/index.wxml" />
+<view class="container" bindtap="globalTap">
+    <view bindtouchstart="touchS" bindtouchmove="touchM" bindtouchend="touchE">
+    <block wx:for="{{selectedSong}}" wx:key="index">
+        <template is="song_item" data="{{song:item, index:index}}"></template>
+    </block>
+    </view>
+</view>
+
+<template name="song_item">
+  <view class="song_item_container" catchtap="chooseSong"  data-code="{{song.code}}" data-index="{{index}}" >
+    <view class="song_item {{song.move}}" data-index="{{index}}">
+      <text class="song_index" data-index="{{index}}">{{index + 1}}.</text>
+      <text class="song_name" data-index="{{index}}">{{song.name}}</text>
+      <text class="song_player" data-index="{{index}}">{{song.player}}</text>
+      <text data-index="{{index}}" class="{{index == 0 ? 'top_song_first' : 'top_song'}}" catchtap="topSong">置顶</text>
+      <text data-index="{{index}}" class="remove_song" catchtap="removeSong">删除</text>
+    </view>
+  </view>
+</template>

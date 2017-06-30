@@ -1,0 +1,4 @@
+
+<template name="avatar">
+  <image class="profileImage" bindtap="toPage" data-page="personal" data-parameter="?userid={{userid}}&role={{role}}&personalType=other" src="{{imgBase+avatar}}" />
+</template>

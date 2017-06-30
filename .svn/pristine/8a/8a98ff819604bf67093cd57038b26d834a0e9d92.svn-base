@@ -1,0 +1,20 @@
+<import src="../common/communityPart.wxml" />
+<import src="../common/loading.wxml" />
+
+<view class="stv-container">
+  <view class="tab-bar swiper-tab">
+    <view wx:for="{{tabs}}" wx:key="unique" data-index="{{index}}" data-current="{{index}}" bindtap="handlerTabTap" class="swiper-tab-list {{activeTab==index?'on':''}}">
+      <text>{{item}}</text>
+    </view>
+    <view style="width: {{stv.lineWidth}}px; left: {{stv.offset/tabs.length}}px" class="under-line {{!stv.tStart? 'withAnimate': ''}}"></view>
+  </view>
+  <view class="scroll-view">
+    <view class="scroll-view-wrapper {{!stv.tStart? 'withAnimate': ''}}" style="left: -{{stv.offset}}px">
+      <view style="width: 100%" class="one-scene">
+        <view wx:for="{{expression_list}}" wx:for-item="commPart" wx:for-index="index" class="expression_div">
+          <image class="expression_img" src="{{imgBase + commPart.thumbHD}}" mode="scaleToFill" bindtap="sendExpression" data-code="{{commPart.code}}"              data-gif="{{commPart.gif}}" data-position="{{commPart.position}}"></image>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

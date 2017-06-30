@@ -1,0 +1,77 @@
+.container {
+	background-color: white;
+}
+.top {
+    background-color: #03a9f4;
+    width: 100%;
+    height: 345rpx;
+}
+.avatar {
+    width:200rpx;
+    height: 200rpx;
+    border-radius:100rpx 100rpx;
+    position: absolute;
+    top:10rpx;
+    left:275rpx;
+}
+.sex {
+    width:32rpx;
+    height:32rpx;
+    position:absolute;
+    top:6rpx;
+    left:295rpx;
+}
+.nickName {
+    text-align:center;
+    width:300rpx;
+    color: white;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.info {
+    position: absolute;
+    top:240rpx;
+    left:200rpx;
+}
+.order_status {
+    width:60rpx;
+    height:60rpx;
+    position:absolute;
+    top:153rpx;
+    left:426rpx;
+}
+.title.song_fav, .title.songlist_fav, .title.order {
+    display: inline-block;
+    width: 85%;
+    border-bottom: 1rpx solid #e6eaf2;
+    height: 115rpx;
+    background-image: url(http://cdn-h3-p1.vas.lutongnet.com/music_unlock/mini-program/image/profile/array.png);
+    line-height: 115rpx;
+    background-repeat: no-repeat;
+    background-size: 13rpx 22rpx;
+    background-position: 95% center;
+    
+}
+
+.icon.song_fav {
+    background-image: url(http://cdn-h3-p1.vas.lutongnet.com/music_unlock/mini-program/image/profile/song_fav.png);
+    
+}
+.icon.songlist_fav{
+    background-image: url(http://cdn-h3-p1.vas.lutongnet.com/music_unlock/mini-program/image/profile/songlist_fav.png);
+}
+.icon.order {
+    background-image: url(http://cdn-h3-p1.vas.lutongnet.com/music_unlock/mini-program/image/profile/order.png);
+}
+.icon {
+    background-repeat: no-repeat;
+    background-size: 40rpx 40rpx;
+    background-position: center center;
+    display: inline-block;
+    width:15%;
+    height: 116rpx;
+    line-height: 115rpx;
+    color: white;
+}
+

@@ -1,0 +1,235 @@
+var config = require('../../config.js')
+var api = require('../../utils/api.js')
+var util = require('../../utils/util.js')
+var slide = require('../../utils/slide.js')
+var toast = require('../../component/toast/index.js')
+
+var app = getApp();
+Page({
+    data: {
+        imgBase: api.imgBase,
+        userInfo: app.globalData.userInfo,
+        btnWidth: 166
+    },
+    toSonglist: function (e) {
+        util.toPage(e);
+    },
+    getRecommendSonglist: function () {
+        var epg = this.data.epg;
+        if (epg && epg.groupList[1]) {
+            var recommendSonglist = epg.groupList[1].metadataList;
+            for (var songlist in recommendSonglist) {
+                if (recommendSonglist[songlist].label.length > 16) {
+                    var label = recommendSonglist[songlist].label;
+                    label = label.substring(0, 15) + '...';
+                    recommendSonglist[songlist].label = label;
+                }
+            }
+            this.setData({
+                recommendSonglist: recommendSonglist
+            });
+            console.log(this.data.recommendSonglist);
+        }
+    },
+    getRecommendSong: function () {
+        var that = this;
+        var epg = this.data.epg;
+        if (epg
+            && epg.groupList[2]
+            && epg.groupList[2].metadataList[0]
+            && epg.groupList[2].metadataList[0].value) {
+            var id = epg.groupList[2].metadataList[0].value;
+            api.post(api.API_URL + api.get_program, {
+                "id": id,
+                "pageable": true,
+                "current": 1,
+                "pageSize": 20
+            }).then(res => {
+                if (res.statusCode == 200
+                    && res.data && res.data.pb && res.data.pb.dataList) {
+                    var recommendSong = res.data.pb.dataList;
+                    that.setData({
+                        recommendSong: recommendSong
+                    });
+                    console.log("app.globalData.userInfo:" + JSON.stringify(app.globalData.userInfo));
+                    if (app.globalData.userInfo === undefined) {
+                        this.setData({
+                            userInfo: app.globalData.userInfo
+                        });
+                        app.notificationCenter.register("login-notification", this, "initFavData");
+
+                    } else {
+                        this.initFavData({userInfo:app.globalData.userInfo});
+                    }
+                }
+            })
+        }
+    },
+    initFavData: function (loginData) {
+        this.setData({
+            userInfo: loginData.userInfo
+        });
+        console.log("1111111111111:"+JSON.stringify(loginData));
+        
+        var that = this;
+        console.log("2222222222222:" + JSON.stringify({
+            "appVersion": config.appVersion,
+            "userid": that.data.userInfo.unionId,
+            "role": that.data.userInfo.role,
+            "type": "song",
+            "pageable": false
+        }));
+        console.log("33333333333:" + JSON.stringify(that.data.userInfo));
+        api.post(api.API_URL + api.get_fav_value, {
+            "appVersion": config.appVersion,
+            "userid": that.data.userInfo.unionId,
+            "role": that.data.userInfo.role,
+            "type": "song",
+            "pageable": false
+        }).then(res => {
+            if (res.statusCode == 200 && res.data
+                && res.data.valueList) {
+                var valueList = res.data.valueList;
+                var valueStr = '';
+                for (var value in valueList) {
+                    valueStr += valueList[value] + ';';
+                }
+                var recommendSong = that.data.recommendSong;
+                for (var song in recommendSong) {
+                    if (valueStr.indexOf(recommendSong[song].code) > -1) {
+                        recommendSong[song].fav = true;
+                    }
+                }
+                that.setData({
+                    recommendSong: recommendSong
+                });
+                console.log(JSON.stringify(res.data) + "\n fav api");
+                console.log(JSON.stringify(that.data.recommendSong) + "\n recommend");
+            }
+        });
+    },
+    onLoad: function (options) {
+        var that = this;
+        api.post(api.API_URL + api.get_epg, { code: "wcx_recommend", appVersion: "A" }).then(res => {
+            if (res.statusCode == 200 && res.data && res.data.epg) {
+                that.setData({
+                    epg: res.data.epg
+                });
+                that.getRecommendSonglist();
+                that.getRecommendSong();
+                console.log(JSON.stringify(res.data.epg));
+            }
+        });
+        this.setData({ connected: app.globalData.connected });
+        slide.bindPage(this, 'recommendSong');
+        toast.bindPage(this);
+    },
+
+    onReady: function () {
+        // Do something when page ready.
+    },
+    onShow: function () {
+        // Do something when page show.
+    },
+    onHide: function () {
+        // Do something when page hide.
+    },
+    onUnload: function () {
+        // Do something when page close.
+    },
+    onPullDownRefresh: function () {
+        // Do something when pull down.
+    },
+    onReachBottom: function () {
+        // Do something when page reach bottom.
+        //this.bindscrolltolower();
+    },
+    onShareAppMessage: function () {
+        return {
+            title: '幸福健身团',
+            desc: '专属您的健身专家',
+            path: '/pages/community',
+            success: function (res) {
+                // 转发成功
+                console.log(res.shareTickets[0]);
+                wx.getShareInfo({
+                    shareTicket: res.shareTickets[0],
+                    success(res) {
+                        console.log(res);
+                    }
+                })
+            },
+        }
+    },
+    previewImg: function (e) {
+        api.previewImg(e);
+    },
+    goConnect: function (e) {
+        wx.navigateTo({
+            url: '/pages/connect_help/index'
+        });
+    },
+    //收藏
+    favSong: function (e) {
+        var that = this;
+        var fav = e.currentTarget.dataset.fav;
+        var index = e.currentTarget.dataset.index;
+        if(fav == 'true') {
+            if (index > -1 && that.data.recommendSong[index].code) {
+                api.post(api.API_URL + api.remove_fav, {
+                    "userid": that.data.userInfo.unionId,
+                    "role": that.data.userInfo.role,
+                    "type": "song",
+                    "value": that.data.recommendSong[index].code,
+                    "appVersion": api.appVersion
+                }).then(res => {
+                    if (res.statusCode == 200 && res.data) {
+                        console.log(JSON.stringify(res.data));
+                        that.data.recommendSong[index].fav = false;
+                        this.setData({ recommendSong: that.data.recommendSong });
+                        toast.showToast('取消收藏成功', 3000);
+                    }
+                });
+            } else {
+                toast.showToast('取消收藏失败', 3000);
+            }
+        } else {
+            if (index > -1 && that.data.recommendSong[index].code) {
+                api.post(api.API_URL + api.add_fav, {
+                    "userid": that.data.userInfo.unionId,
+                    "role": that.data.userInfo.role,
+                    "orderType": that.data.userInfo.orderType,
+                    "type": "song",
+                    "value": that.data.recommendSong[index].code,
+                    "appVersion": api.appVersion
+                }).then(res => {
+                    if (res.statusCode == 200 && res.data) {
+                        console.log(JSON.stringify(res.data));
+                        that.data.recommendSong[index].fav = true;
+                        this.setData({ recommendSong: that.data.recommendSong });
+                        toast.showToast('收藏成功', 3000);
+                    }
+                });
+            } else {
+                toast.showToast('收藏失败', 3000);
+            }
+        }
+    },
+    //点歌
+    chooseSong:function (e) {
+        console.log('chooseSong');
+        var connected = this.data.connected;
+        if(connected === true) {
+            var index = e.currentTarget.dataset.index;
+            var recommendSong = this.data.recommendSong;
+            if (recommendSong && recommendSong[index]) {
+                console.log(JSON.stringify(recommendSong[index]));
+            }
+        } else {
+            this.goConnect();
+            //var index = e.currentTarget.dataset.index;
+            //this.data.recommendSong.splice(index, 1);
+            //this.setData({recommendSong:this.data.recommendSong});
+        }
+    }
+})

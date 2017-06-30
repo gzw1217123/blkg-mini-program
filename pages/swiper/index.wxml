@@ -1,0 +1,4 @@
+<view class="container">
+    <image class="swiperImg" src="{{imgFrom+'swiper/1.jpg'}}"  />
+    <view class="exit" bindtap="exit"></view>
+</view>

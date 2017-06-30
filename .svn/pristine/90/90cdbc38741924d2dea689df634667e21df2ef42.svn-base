@@ -1,0 +1,6 @@
+<view class="container">
+<view class="connect_tip" bindtap="goConnect">
+<view class="tip">还木有连接电视哦！快戳我去连接吧！</view>
+<view class="tip_icon"></view>
+</view>
+</view>

@@ -1,0 +1,140 @@
+var api = require('../../../utils/api.js')
+var util = require('../../../utils/util.js')
+var app = getApp()
+var Connector = require('../../../utils/connector-pomelo.js')
+Page({
+  data: {
+    userInfo: {},
+    loading: false,
+    disabled: false,
+    inputLen: 0,
+    connector: {},
+    tv_id: '329670409FB67FBD'
+  },
+  bindKeyInput: function (e) {
+    var value = e.detail.value
+    this.setData({
+      inputLen: value.length
+    });
+  },
+  /**
+* 发布
+*/
+  submit: function (e) {
+    var that = this;
+    var data = {};
+
+    var content = e.detail.value.content;
+    if (content.trim().length == 0) {
+      util.alert("请添加弹幕");
+      return
+    }
+    that.setData({
+      loading: true,
+      disabled: true,
+    });
+    if (content.trim().length != 0) {
+      data.content = content
+    }
+    that.submitAfter(data);
+  },
+  /**
+* 发布,保存至数据库
+*/
+  submitAfter: function (data) {
+
+    var that = this;
+    var connector = this.data.connector;
+    var code = 'test';
+    var userid = 'test';
+    var time = 10;
+    var userInfo = app.globalData.userInfo;
+    api.post(api.API_URL + api.SEND_BARRAGE, {
+      "code": code,
+      "content": data.content,
+      "userid": userid,
+      "time": time,
+      "status": 'non-checked',
+      "source": 'MINA',
+      "apkVersion": "4.1.1"
+    }).then(res => {
+      console.log(res);
+      if (res.statusCode == 200) {
+        connector.sendMessage("@" + that.data.tv_id, "barrage", data.content);
+        util.alert("发送成功");
+        console.log("发送弹幕成功");
+        setTimeout(function () {
+          wx.navigateBack({
+            delta: 1
+          })
+        }, 1000)
+      }
+    })
+  },
+  onLoad: function () {
+    var that = this
+    var connector = new Connector('weixin-ott-kalaok.lutongnet.com', '3014');
+    this.data.connector = connector;
+    var phone_id = 'test';
+    connector.on('connect', function () {
+      connector.login(phone_id, function (data) {
+        if (data.code === 200) {
+          console.log('登录成功！');
+          that.afterConnect();
+        }
+        else {
+          util.alert("您的网络异常,登录失败");
+        }
+
+      });
+    });
+
+
+    app.getUserInfo(function (userInfo) {
+      that.setData({
+        userInfo: userInfo
+      })
+    })
+  },
+  //连接后的操作
+  afterConnect: function () {
+    var that = this;
+    var connector = this.data.connector;
+
+    connector.getUserInfo(that.data.tv_id, function (data) {
+
+      if (data.isOnline == false) {
+        console.log('您的电视不在互动状态哦，即将自动退出播控页面');
+      }
+      else {
+        console.log('查询电视状态');
+        connector.sendMessage("@" + that.data.tv_id, "getTVPage", "");
+      }
+    });
+
+    connector.on('disconnect', function (data) {
+      console.log('与服务器连接中断！');
+    });
+    connector.on('onUserSendMessage', function (data) {
+      if (data.from === connector.uid) return; // 屏蔽自己发来的消息
+      console.log('收到消息：', data.message);
+      //log(data.from + ':' + data.message.content);
+    });
+
+
+    connector.on('onUserLogin', function (data) { }); // 用户登录时触发
+    connector.on('onUserLogout', function (data) { }); // 用户退出时触发
+    connector.on('onUserJoinRoom', function (data) { }); // 用户进入房间时触发
+    connector.on('onUserLeaveRoom', function (data) { }); // 用户离开房间时触发
+
+  },
+  /**
+   * 跳转页面
+   */
+  toPage: function (e) {
+    var page = e.currentTarget.dataset.page;
+    util.toPage(e, 1);
+
+  }
+})
+

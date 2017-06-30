@@ -1,0 +1,16 @@
+
+<view class="stv-container">
+  <view class="tab-bar swiper-tab">
+    <view wx:for="{{tabs}}" wx:key="unique" data-index="{{index}}" data-current="{{index}}" bindtap="handlerTabTap" class="swiper-tab-list {{activeTab==index?'on':''}}">
+      <text>{{item}}</text>
+    </view>
+
+  </view>
+  <view class="scroll-view">
+      <view style="width: 100%" class="one-scene">
+        <view wx:for="{{expression_list}}" wx:for-item="commPart" wx:for-index="index" class="expression_div">
+          <image class="expression_img" src="{{imgBase + commPart.thumbHD}}" mode="scaleToFill" bindtap="sendExpression" data-code="{{commPart.code}}"              data-gif="{{commPart.gif}}" data-position="{{commPart.position}}"></image>
+        </view>
+      </view>
+  </view>
+</view>

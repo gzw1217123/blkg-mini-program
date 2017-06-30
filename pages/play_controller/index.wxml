@@ -1,0 +1,30 @@
+<view class="stv-container">
+
+<view class="{{connectClass}}" hover-class="{{hoverConnectClass}}" bindtap="toConnect" ></view>
+<view class="circle_div">
+<view class="next_div" hover-class="{{hoverNextClass}}" bindtap="playControl" data-type="nextSong">
+  <view class="{{nextClass}}"></view>
+</view>
+<view class="replay_div" hover-class="{{hoverReplayClass}}" bindtap="playControl" data-type="replay">
+  <view class="{{replayClass}}"></view>
+</view>
+<view class="play_div" hover-class="{{hoverPlayClass}}" bindtap="playControl" data-type="playOrPause">
+  <view class="{{playClass}}"></view>
+</view>
+<view class="accompany_div" hover-class="{{hoverAccompanyClass}}" bindtap="playControl" data-type="accompanyOrOrginal">
+    <view class="{{accompanyClass}}"></view>
+</view>
+</view>
+<view class="volume">
+  <view class="vol_up_div" hover-class="vol_up_on" bindtap="playControl" data-type="volUp"></view>
+  <view class="vol_down_div"  hover-class="vol_down_on" bindtap="playControl" data-type="volDown"></view>
+</view>
+
+
+  <view class="tab-bar swiper-tab">
+    <view wx:for="{{tabs}}" wx:key="unique" data-index="{{index}}" data-current="{{index}}" bindtap="handlerTabTap" data-type="toPage" class="swiper-tab-list {{activeTab==index?'on':''}}" >
+      <text>{{item}}</text>
+    </view>
+    <view style="width: {{stv.lineWidth}}px; left: {{stv.offset/tabs.length}}px" class="under-line {{!stv.tStart? 'withAnimate': ''}}"></view>
+  </view>
+</view>
